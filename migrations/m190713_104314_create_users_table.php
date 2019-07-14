@@ -17,7 +17,7 @@ class m190713_104314_create_users_table extends Migration
             'username' => $this->string(255)->notNull()->unique(),
             'password_hash' => $this->string(60),
             'token' => $this->string(60),
-        ]);
+        ], 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB');
 
         //batchInsert менее информативен
         $this->insert('{{%users}}', [

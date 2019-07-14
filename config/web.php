@@ -18,7 +18,9 @@ $config = [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
-            'baseUrl' => ''
+            'baseUrl' => '',
+            'enableCsrfCookie' => false,
+            'enableCsrfValidation' => false
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -54,9 +56,20 @@ $config = [
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['login', 'user'],
+                    'controller' => ['user'],
                     'prefix' => 'api',
-                    'pluralize' => false
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST login' => 'login',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['post'],
+                    'prefix' => 'api',
+                    'extraPatterns' => [
+                        'PUT <id>/like' => 'like',
+                    ],
                 ],
             ],
         ],
