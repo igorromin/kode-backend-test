@@ -59,7 +59,16 @@ class PostController extends Controller
                     }
                 }
             }
-
+            if ($model->link) {
+                $field = new PostField(true);
+                $preview = PreviewController::getPreviewByUrl($model->link);
+                $link_array = ['url' => $model->link, 'preview' => $preview];
+                $field->load(['post_id' => $post_id, 'type' => 'link'],'');
+                $field->value->set(json_encode($link_array, JSON_UNESCAPED_UNICODE));
+                if (!($field->validate() && $field->save())) {
+                    return $field;
+                }
+            }
            return $model;
         } else {
             return $model;
