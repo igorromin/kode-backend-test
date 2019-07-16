@@ -1,20 +1,26 @@
 <?php
 
 
-namespace app\controllers;
+namespace app\modules\api\controllers;
 
 use app\models\Like;
 use app\models\Post;
 use app\models\PostField;
-use app\models\PostForm;
+use app\modules\api\models\PostForm;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\auth\HttpBearerAuth;
+use yii\filters\VerbFilter;
 use yii\rest\Controller;
+use yii\web\HttpException;
 use yii\web\UploadedFile;
 
-class PostController extends Controller
+class PostsController extends Controller
 {
-
+    public $serializer = [
+        'class' => 'app\components\DefaultSerializer',
+        'collectionEnvelope' => 'items'
+    ];
 
     public function behaviors()
     {
@@ -23,7 +29,21 @@ class PostController extends Controller
             'class' => HttpBearerAuth::class,
             'only' => ['create', 'delete', 'like'],
         ];
+        $behaviors['verbs'] = [
+            'class' => VerbFilter::class,
+            'actions' => [
+                'index'  => ['GET'],
+                'view'   => ['GET'],
+                'create' => ['POST'],
+            ]
+        ];
         return $behaviors;
+    }
+
+    public function actionIndex() {
+        return new ActiveDataProvider([
+            'query' => Post::find(),
+        ]);
     }
 
     public function actionCreate() {
@@ -43,7 +63,7 @@ class PostController extends Controller
 
             if ($model->text) {
                 $field = new PostField();
-                $field->load(['post_id' => $post_id, 'value' => $params['text'], 'type' => 'text'],'');
+                $field->load(['post_id' => $post_id, 'value' => ['field' => $params['text']], 'type' => 'text'],'');
                 if (!($field->validate() && $field->save())) {
                     return $field;
                 }
@@ -51,25 +71,25 @@ class PostController extends Controller
             if ($model->files) {
                 foreach ($model->files as $file) {
                     $file_name = Yii::$app->security->generateRandomString() . '.' . $file->extension;
-                    $file->saveAs(Yii::getAlias('@app/uploads/'.$file_name));
+                    $file->saveAs(Yii::getAlias(PostField::$uploadPath.$file_name));
                     $field = new PostField();
-                    $field->load(['post_id' => $post_id, 'value' => $file_name, 'type' => 'file'],'');
+                    $field->load(['post_id' => $post_id, 'value' => ['field' => $file_name], 'type' => 'file'],'');
                     if (!($field->validate() && $field->save())) {
                         return $field;
                     }
                 }
             }
             if ($model->link) {
-                $field = new PostField(true);
+                $field = new PostField();
                 $preview = PreviewController::getPreviewByUrl($model->link);
-                $link_array = ['url' => $model->link, 'preview' => $preview];
-                $field->load(['post_id' => $post_id, 'type' => 'link'],'');
-                $field->value->set(json_encode($link_array, JSON_UNESCAPED_UNICODE));
+                $link_array = ['field' => $model->link, 'info' => $preview];
+                $field->load(['post_id' => $post_id, 'value' => $link_array,  'type' => 'link'],'');
+                //$field->value->set(json_encode($link_array, JSON_UNESCAPED_UNICODE));
                 if (!($field->validate() && $field->save())) {
                     return $field;
                 }
             }
-           return $model;
+            return $post;
         } else {
             return $model;
         }
@@ -90,4 +110,23 @@ class PostController extends Controller
             }
         }
     }
+
+    public function actionDelete($id) {
+        $post = Post::findOne(['id' => $id]);
+        if ($post && $post->user_id == Yii::$app->user->id) {
+            $post->deleted_at = time();
+            $post->save();
+            return Yii::t('app', 'Successful deleted');
+        } elseif ($post) {
+            throw new HttpException(403, Yii::t('app', 'You are not a owner'));
+        } else {
+            throw new HttpException(404, Yii::t('app', 'Post not found'));
+        }
+    }
+
+    public function actionView($id) {
+        $this->serializer['defaultExpand'] = ['likes'];
+        return Post::findOne($id);
+    }
+
 }

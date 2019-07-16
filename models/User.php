@@ -115,6 +115,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return static::findOne(['username' => $username]);
     }
 
-
+    public function fields() {
+        $fields = parent::fields();
+        unset($fields['password_hash']);
+        unset($fields['token']);
+        return $fields;
+    }
 
 }

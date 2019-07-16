@@ -14,7 +14,8 @@ use yii\db\ActiveRecord;
  * @property int $deleted_at
  *
  * @property Users $user
- * @property PostsFields[] $postsFields
+ * @property PostFields[] $postFields
+ * @property Likes[] $likes
  */
 class Post extends ActiveRecord
 {
@@ -82,8 +83,32 @@ class Post extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPostsFields()
+    public function getPostFields()
     {
-        return $this->hasMany(PostsFields::class, ['post_id' => 'id']);
+        return $this->hasMany(PostField::class, ['post_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLikes()
+    {
+        return $this->hasMany(Like::class, ['post_id' => 'id']);
+    }
+
+    public function fields() {
+        $fields = parent::fields();
+        unset($fields['user_id'], $fields['deleted_at']);
+        $fields['user'] = 'user';
+        $fields['post_fields'] = 'postFields';
+        $fields['likes'] = function () {
+            return (int)$this->getLikes()->count();
+        };
+        return $fields;
+    }
+
+    public function extraFields() {
+        return ['likes'];
+    }
+
 }

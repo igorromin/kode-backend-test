@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\modules\api\models;
 
 use yii\base\Model;
 
@@ -27,7 +27,7 @@ class PostForm extends Model
 
     public function atLeastOne($attribute, $params)
     {
-        if(!$this->is_array_empty($this->getAttributes($params['in']))) {
+        if($this->is_array_empty($this->getAttributes($params['in']))) {
             $this->addError($attribute, \Yii::t('app', 'You must fill at least one of the attributes {attributes}!', [
                 'attributes' => implode(', ', $params['in']),
             ]));
@@ -37,12 +37,12 @@ class PostForm extends Model
     private function is_array_empty($arr){
         if(is_array($arr)){
             foreach($arr as $key => $value){
-                if(!empty($value) || $value != NULL || $value != ""){
-                    return true;
+                if($value !== 0 && !empty($value)){
+                    return false;
                     break;
                 }
             }
-            return false;
+            return true;
         }
     }
 }

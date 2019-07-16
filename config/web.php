@@ -6,10 +6,16 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'api'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+    ],
+    'modules' => [
+        'api' => [
+            'basePath' => '@app/modules/api',
+            'class' => 'app\modules\api\Module',
+        ],
     ],
     'components' => [
         'request' => [
@@ -51,24 +57,28 @@ $config = [
         'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
+            'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['user'],
-                    'prefix' => 'api',
+                    'controller' => ['api/user'],
                     'pluralize' => false,
+                    'prefix' => 'api',
                     'patterns' => [
                         'POST login' => 'login',
                     ],
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['post'],
-                    'prefix' => 'api',
+                    'controller' => ['api/posts'],
+                    'pluralize' => false,
+                    'only' => ['index', 'create', 'view', 'like', 'delete', 'options'],
                     'extraPatterns' => [
+                        //'POST' => 'create',
                         'PUT <id>/like' => 'like',
+                        'DELETE <id>' => 'delete',
+                        'OPTIONS' => 'options',
                     ],
                 ],
             ],

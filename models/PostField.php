@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use paulzi\jsonBehavior\JsonBehavior;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "posts_fields".
@@ -17,34 +18,27 @@ use paulzi\jsonBehavior\JsonBehavior;
  */
 class PostField extends \yii\db\ActiveRecord
 {
-    private $_isJson;
-
-    public function __construct($isJson = false, $config = []) {
-        $this->_isJson = $isJson;
-        parent::__construct($config);
-    }
+    public static $uploadPath;
+    const UPLOAD_DIR = "uploads/";
 
     /**
-     * @return bool
+     * @return string
      */
-    public function getIsJson() {
-        return $this->_isJson;
+    public static function getUploadPath() {
+        return self::$uploadPath;
     }
 
-    /**
-     * @param bool $isJson
-     */
-    public function setIsJson($isJson) {
-        $this->_isJson = $isJson;
+    public function init() {
+        parent::init();
+        self::$uploadPath = Yii::getAlias('@webroot/'. self::UPLOAD_DIR);
     }
 
     public function behaviors() {
-        if ($this->isJson) {
-            return [['class'      => JsonBehavior::className(),
-                     'attributes' => ['value'],],];
-        } else {
-            return [];
-        }
+        return [
+            ['class'      => JsonBehavior::class,
+             'attributes' => ['value'],
+            ],
+        ];
     }
 
     /**
@@ -89,5 +83,15 @@ class PostField extends \yii\db\ActiveRecord
         return $this->hasOne(Post::class, ['id' => 'post_id']);
     }
 
-
+    public function fields() {
+        $fields = parent::fields();
+        unset($fields['id']);
+        unset($fields['post_id']);
+        if ($this->type == 'file') {
+            $fields['value'] = function () {
+                return Url::to('@web/'.self::UPLOAD_DIR.$this->value['field'], true);
+            };
+        }
+        return $fields;
+    }
 }

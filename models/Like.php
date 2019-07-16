@@ -72,4 +72,8 @@ class Like extends \yii\db\ActiveRecord
         }
         return false;
     }
+
+    public function fields() {
+        return ['user'];
+    }
 }

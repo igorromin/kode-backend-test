@@ -1,14 +1,17 @@
-Options +FollowSymLinks
-IndexIgnore */*
-RewriteEngine on
+Options -Indexes
 
-RewriteCond %{REQUEST_URI} !^/(web)
-RewriteRule ^assets/(.*)$ /web/assets/$1 [L]
-RewriteRule ^css/(.*)$ web/css/$1 [L]
-RewriteRule ^js/(.*)$ web/js/$1 [L]
-RewriteRule ^images/(.*)$ web/images/$1 [L]
-RewriteRule (.*) /web/$1
+<IfModule mod_rewrite.c>
+  RewriteEngine on
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /web/index.php
+  RewriteCond %{REQUEST_URI} !^public
+  RewriteRule ^(.*)$ web/$1 [L]
+</IfModule>
+
+# Deny accessing below extensions
+<Files ~ "(.json|.lock|.git)">
+Order allow,deny
+Deny from all
+</Files>
+
+# Deny accessing dot files
+RewriteRule (^\.|/\.) - [F]
