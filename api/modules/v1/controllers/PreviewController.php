@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\api\controllers;
+namespace app\api\modules\v1\controllers;
 
 
 class PreviewController

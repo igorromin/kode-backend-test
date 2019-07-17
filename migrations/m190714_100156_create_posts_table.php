@@ -38,6 +38,13 @@ class m190714_100156_create_posts_table extends Migration
             'id',
             'CASCADE'
         );
+
+        // creates index for column `deleted_at`
+        $this->createIndex(
+            '{{%idx-posts-deleted_at}}',
+            '{{%posts}}',
+            'deleted_at'
+        );
     }
 
     /**
@@ -54,6 +61,12 @@ class m190714_100156_create_posts_table extends Migration
         // drops index for column `user_id`
         $this->dropIndex(
             '{{%idx-posts-user_id}}',
+            '{{%posts}}'
+        );
+
+        // drops index for column `deleted_at`
+        $this->dropIndex(
+            '{{%idx-posts-deleted_at}}',
             '{{%posts}}'
         );
 

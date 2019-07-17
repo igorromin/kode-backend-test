@@ -12,6 +12,7 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
+        '@api' => '@app/modules/api/controllers'
     ],
     'components' => [
         'cache' => [
@@ -28,6 +29,17 @@ $config = [
         'db' => $db,
     ],
     'params' => $params,
+    'controllerMap' => [
+        'build-rest-doc' => [
+            'sourceDirs' => [
+                '@api',   // <-- path to your API controllers
+            ],
+            'template' => '//restdoc/restdoc.twig',
+            'class' => '\pahanini\restdoc\controllers\BuildController',
+            'sortProperty' => 'shortDescription', // <-- default value (how controllers will be sorted)
+            'targetFile' => 'docs/nice-documentation.html'
+        ],
+    ]
     /*
     'controllerMap' => [
         'fixture' => [ // Fixture generation command line.

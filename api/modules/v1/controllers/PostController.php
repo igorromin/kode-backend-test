@@ -1,12 +1,12 @@
 <?php
 
 
-namespace app\modules\api\controllers;
+namespace app\api\modules\v1\controllers;
 
 use app\models\Like;
 use app\models\Post;
 use app\models\PostField;
-use app\modules\api\models\PostForm;
+use app\api\modules\v1\models\PostForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\auth\HttpBearerAuth;
@@ -15,7 +15,7 @@ use yii\rest\Controller;
 use yii\web\HttpException;
 use yii\web\UploadedFile;
 
-class PostsController extends Controller
+class PostController extends Controller
 {
     public $serializer = [
         'class' => 'app\components\DefaultSerializer',
@@ -29,20 +29,13 @@ class PostsController extends Controller
             'class' => HttpBearerAuth::class,
             'only' => ['create', 'delete', 'like'],
         ];
-        $behaviors['verbs'] = [
-            'class' => VerbFilter::class,
-            'actions' => [
-                'index'  => ['GET'],
-                'view'   => ['GET'],
-                'create' => ['POST'],
-            ]
-        ];
+
         return $behaviors;
     }
 
     public function actionIndex() {
         return new ActiveDataProvider([
-            'query' => Post::find(),
+            'query' => Post::find()->where(['=', 'deleted_at', 0]),
         ]);
     }
 
@@ -112,7 +105,7 @@ class PostsController extends Controller
     }
 
     public function actionDelete($id) {
-        $post = Post::findOne(['id' => $id]);
+        $post = Post::find()->where(['=', 'deleted_at', 0])->andWhere(['=', 'id', $id])->one();
         if ($post && $post->user_id == Yii::$app->user->id) {
             $post->deleted_at = time();
             $post->save();
@@ -126,7 +119,12 @@ class PostsController extends Controller
 
     public function actionView($id) {
         $this->serializer['defaultExpand'] = ['likes'];
-        return Post::findOne($id);
+        $post = Post::find()->where(['=', 'deleted_at', 0])->andWhere(['=', 'id', $id])->one();
+        if ($post) {
+            return $post;
+        } else {
+            throw new HttpException(404, Yii::t('app', 'Post not found'));
+        }
     }
 
 }

@@ -6,34 +6,22 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'api'],
+    'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
-    ],
-    'modules' => [
-        'api' => [
-            'basePath' => '@app/modules/api',
-            'class' => 'app\modules\api\Module',
-        ],
     ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '55S5SPS2qGCiQ9oclGZFhEIdJIBS8ISe',
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ],
-            'baseUrl' => '',
-            'enableCsrfCookie' => false,
-            'enableCsrfValidation' => false
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
             'identityClass' => 'app\models\User',
-            'enableSession' => false,
+            'enableAutoLogin' => true,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -55,61 +43,14 @@ $config = [
             ],
         ],
         'db' => $db,
+        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/user'],
-                    'pluralize' => false,
-                    'prefix' => 'api',
-                    'patterns' => [
-                        'POST login' => 'login',
-                    ],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/posts'],
-                    'pluralize' => false,
-                    'only' => ['index', 'create', 'view', 'like', 'delete', 'options'],
-                    'extraPatterns' => [
-                        //'POST' => 'create',
-                        'PUT <id>/like' => 'like',
-                        'DELETE <id>' => 'delete',
-                        'OPTIONS' => 'options',
-                    ],
-                ],
             ],
         ],
-        'response' => [
-            'class' => 'yii\web\Response',
-            'format' => 'json',
-            'on beforeSend' => function ($event) {
-                $response = $event->sender;
-                if ($response->data !== null) {
-                    $data = $response->data;
-                    // Error handle
-                    $error = '';
-                    if( ! $response->isSuccessful) {
-                        if(isset($data['message'])) {
-                            $error = $data['message'];
-                        } elseif(isset(current($data)['message'])) {
-                            $error = current($data)['message'];
-                        }
-                    }
-                    $response->data = [
-                        'status' => $response->isSuccessful,
-                        'code' => $response->statusCode,
-                        'error' => $error,
-                    ];
-                    if($response->isSuccessful) {
-                        $response->data['data'] = $data;
-                    }
-                }
-            },
-        ],
+        */
     ],
     'params' => $params,
 ];

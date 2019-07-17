@@ -1,9 +1,9 @@
 <?php
 
 
-namespace app\modules\api\controllers;
+namespace app\api\modules\v1\controllers;
 
-use app\modules\api\models\LoginForm;
+use app\api\modules\v1\models\LoginForm;
 use yii\rest\Controller;
 use yii\web\HttpException;
 

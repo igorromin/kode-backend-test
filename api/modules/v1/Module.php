@@ -1,10 +1,13 @@
 <?php
-namespace app\modules\api;
+// Check this namespace:
+namespace app\api\modules\v1;
+
 class Module extends \yii\base\Module
 {
-    public $controllerNamespace = 'app\modules\api\controllers';
     public function init()
     {
         parent::init();
+
+        // ...  other initialization code ...
     }
 }
