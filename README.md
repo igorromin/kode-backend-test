@@ -10,6 +10,11 @@ Endpoint: /api/v1
 
 [API Documentation](https://lxn-kode.restlet.io/)
 
+After install run this:
+```bash
+./yii migrate
+```
+
 ### Docs
 
 DIRECTORY STRUCTURE
