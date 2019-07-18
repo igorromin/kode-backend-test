@@ -4,6 +4,14 @@
     </a>
 </p>
 
+INSTALL
+-------------
+
+Run this:
+```bash
+composer update
+```
+
 API
 -------------
 Endpoint: /api/v1
