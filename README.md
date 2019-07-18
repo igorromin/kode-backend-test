@@ -16,6 +16,8 @@ API
 -------------
 Endpoint: /api/v1
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/a098368a227eb02ea35d)
+
 [API Documentation](https://lxn-kode.restlet.io/)
 
 After install run this:
