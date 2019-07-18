@@ -35,7 +35,7 @@ class PostController extends Controller
 
     public function actionIndex() {
         return new ActiveDataProvider([
-            'query' => Post::find()->where(['is', 'deleted_at', null]),
+            'query' => Post::find()->where(['=', 'deleted_at', 0]),
         ]);
     }
 
@@ -105,7 +105,7 @@ class PostController extends Controller
     }
 
     public function actionDelete($id) {
-        $post = Post::find()->where(['is', 'deleted_at', null])->andWhere(['=', 'id', $id])->one();
+        $post = Post::find()->where(['=', 'deleted_at', 0])->andWhere(['=', 'id', $id])->one();
         if ($post && $post->user_id == Yii::$app->user->id) {
             $post->deleted_at = time();
             $post->save();
@@ -119,7 +119,7 @@ class PostController extends Controller
 
     public function actionView($id) {
         $this->serializer['defaultExpand'] = ['likes'];
-        $post = Post::find()->where(['is', 'deleted_at', null])->andWhere(['=', 'id', $id])->one();
+        $post = Post::find()->where(['=', 'deleted_at', 0])->andWhere(['=', 'id', $id])->one();
         if ($post) {
             return $post;
         } else {

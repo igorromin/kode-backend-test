@@ -67,6 +67,7 @@ class Post extends ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             $this->user_id = Yii::$app->user->id;
+            $this->deleted_at = 0;
             return true;
         }
         return false;
